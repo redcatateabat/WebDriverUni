@@ -10,6 +10,7 @@ import pages.Wdu;
 
 import java.text.DateFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,8 +29,9 @@ public class TestClass {
         Browser.getBrowser().manage().window().maximize();
         Browser.getBrowser().get("http://webdriveruniversity.com/Datepicker/index.html");
 
-        String currentDate = Browser.getBrowser().findElementByClassName("form-control").getAttribute("value");
-        System.out.println(currentDate);
+        LocalDate today = LocalDate.now();
+        System.out.println(today.format(DateTimeFormatter.ofPattern("d")));
+
     }
     }
 

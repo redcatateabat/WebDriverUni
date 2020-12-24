@@ -6,8 +6,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.Wdu;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatepickerTest extends BaseTest {
 
@@ -22,58 +25,28 @@ public class DatepickerTest extends BaseTest {
 
         LocalDate today = LocalDate.now();
 
+        //-----GET FULL VALUE FROM THE FIELD
         wait.until(ExpectedConditions.attributeToBe(By.className("form-control"), "class", "form-control"));
-        String currentDate = Browser.getBrowser().findElementByClassName("form-control").getAttribute("value");
-        DateTimeFormatter completeDate = DateTimeFormatter.ofPattern("MM-dd-yyyy");
-        Assert.assertEquals(today.format(completeDate), currentDate);
+        String currentDateFromDropdown = Browser.getBrowser().findElementByClassName("form-control").getAttribute("value");
+        Assert.assertEquals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")), currentDateFromDropdown);
 
-        DateTimeFormatter day = DateTimeFormatter.ofPattern("dd");
+        //-----READ VALUE FROM BUTTONS
+        DateTimeFormatter day = DateTimeFormatter.ofPattern("d");
+        DateTimeFormatter month = DateTimeFormatter.ofPattern("MMM");
+        DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
+
         wdu.getDatepicker().getCalendarButton().click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[@class='today day']")));
 
-        String doubleDigitDate = "";
-        if (wdu.getDatepicker().getThisDay().getText().length()<2){
-            doubleDigitDate = "0"+wdu.getDatepicker().getThisDay().getText();
-        }
-        else doubleDigitDate = wdu.getDatepicker().getThisDay().getText();
+        String dateFromDropdown = wdu.getDatepicker().getThisDay().getText();
+        Assert.assertEquals(dateFromDropdown,today.format(day));
 
-        Assert.assertEquals(doubleDigitDate,today.format(day));
 
-        String monthName = "";
-        DateTimeFormatter month = DateTimeFormatter.ofPattern("MM");
-        String monthNumber = today.format(month);
-        switch(monthNumber){
-            case "01": monthName = "Jan";
-            break;
-            case "02": monthName = "Feb";
-            break;
-            case "03" : monthName = "Mar";
-            break;
-            case "04" : monthName = "Apr";
-            break;
-            case "05" : monthName = "May";
-            break;
-            case "06" : monthName = "Jun";
-            break;
-            case "07" : monthName = "Jul";
-            break;
-            case "08" : monthName = "Aug";
-            break;
-            case "09" : monthName = "Sep";
-            break;
-            case "10" : monthName = "Oct";
-            break;
-            case "11" : monthName = "Nov";
-            break;
-            case "12" : monthName = "Dec";
-            break;
-
-        }
-
+        String monthName = today.format(month);
         wdu.getDatepicker().getMonthUpButton().click();
         Assert.assertEquals(monthName, wdu.getDatepicker().getThisMonth().getText());
 
-        DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
+
         wdu.getDatepicker().getYearUpButton().click();
         Assert.assertEquals(today.format(year), wdu.getDatepicker().getThisYear().getText() );
 
@@ -81,13 +54,17 @@ public class DatepickerTest extends BaseTest {
                 + ": "+ today.format(day)+ "/" + monthName+ "/" + today.format(year));
     }
 
-    /*@Test
+    @Test
     public void selectDate(){
 
         scrollAndGoTo(wdu.getHomepage().getDatepickerLink());
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[text()='Datepicker']")));
+        wdu.getDatepicker().getCalendarButton().click();
 
-        
+        wdu.getDatepicker().getForwardButton().click(); //go one month forward
 
-    }*/
+
+
+
+    }
 }
