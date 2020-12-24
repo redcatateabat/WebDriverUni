@@ -65,13 +65,12 @@ public class DatepickerTest extends BaseTest {
 
         wdu.getDatepicker().getForwardButton().click(); //go one month forward
 
-        Month selectedMonth = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).getMonth();
+        Month activeMonth = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).getMonth();
         boolean isItLeapYear = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).isLeapYear();
-        int monthLenght = selectedMonth.length(isItLeapYear);
 
-        Random r = new Random(); //click a random date
+        Random r = new Random(); //click a random day
         int min = 1;
-        int max = monthLenght-1;
+        int max = activeMonth.length(isItLeapYear)-1;
         int dateRange = r.nextInt(max-min) + min;
         String selectedDate = wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").getText();
         wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").click();
@@ -87,5 +86,41 @@ public class DatepickerTest extends BaseTest {
         System.out.println("Selected date is "+ selectedDateComplete);
 
 
+    }
+
+    @Test
+    public void selectRandomDates() {
+
+        scrollAndGoTo(wdu.getHomepage().getDatepickerLink());
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[text()='Datepicker']")));
+        wdu.getDatepicker().getCalendarButton().click();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//th[@class='datepicker-switch']")));
+        wdu.getDatepicker().getMonthUpButton().click(); //go to selection of months
+        wdu.getDatepicker().getYearUpButton().click(); //go to selection of years
+
+        Random r = new Random();
+        int yearRange = r.nextInt(9-1)+1; //get random year
+        String selectedYear = wdu.getDatepicker().findElement("(//span[@class=\"year\"])["+yearRange+"]").getText();
+        wdu.getDatepicker().findElement("(//span[@class=\"year\"])["+yearRange+"]").click();
+
+        int monthRange = r.nextInt(12-1) + 1; //get random month
+        String selectedMonth = wdu.getDatepicker().findElement("(//span[@class=\"month\"])["+monthRange+"]").getText();
+        wdu.getDatepicker().findElement("(//span[@class=\"month\"])["+monthRange+"]").click();
+
+        Month activeMonth = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).getMonth();
+        boolean isItLeapYear = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).isLeapYear();
+
+        int min = 1; //get random day
+        int max = activeMonth.length(isItLeapYear)-1;
+        int dateRange = r.nextInt(max-min) + min;
+        String selectedDate = wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").getText();
+        wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").click();
+
+
+        String selectedDateComplete = selectedDate +" "+selectedMonth+ " "+selectedYear;
+        LocalDate selectedDateFormatted = LocalDate.parse(selectedDateComplete, DateTimeFormatter.ofPattern("d MMM yyyy"));
+        Assert.assertEquals(selectedDateFormatted.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")), getDateFieldValue());
+        System.out.println("Selected date is "+ selectedDateComplete);
     }
 }
