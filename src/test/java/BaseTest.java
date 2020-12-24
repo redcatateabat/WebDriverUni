@@ -53,4 +53,9 @@ public class BaseTest {
         link.click();
         switchTab();
     }
+
+    public static String getDateFieldValue() {
+        return Browser.getBrowser().findElementByCssSelector("div#datepicker>input").getAttribute("value");
+    }
+
 }

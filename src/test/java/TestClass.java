@@ -10,12 +10,11 @@ import pages.Wdu;
 
 import java.text.DateFormat;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class TestClass {
 
@@ -24,13 +23,27 @@ public class TestClass {
 
     @Test
 
-    public void test1() {
+    public void test1() throws InterruptedException {
 
         Browser.getBrowser().manage().window().maximize();
         Browser.getBrowser().get("http://webdriveruniversity.com/Datepicker/index.html");
 
-        LocalDate today = LocalDate.now();
-        System.out.println(today.format(DateTimeFormatter.ofPattern("d")));
+        wdu.getDatepicker().getCalendarButton().click();
+        Month selectedMonth = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).getMonth();
+        boolean isItLeapYear = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).isLeapYear();
+        int monthLenght = selectedMonth.length(isItLeapYear);
+
+        Random r = new Random();
+        int min = 1;
+        int max = monthLenght-1;
+        int dateRange = r.nextInt(max-min) + min;
+        String selectedDate = wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").getText();
+        wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").click();
+        wdu.getDatepicker().getCalendarButton().click();
+
+        String selectedMonthYear = wdu.getDatepicker().getMonthUpButton().getText();
+
+        System.out.println("Selected date is "+ selectedDate +" "+selectedMonthYear);
 
     }
     }

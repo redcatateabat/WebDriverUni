@@ -8,9 +8,12 @@ import pages.Wdu;
 
 import java.lang.reflect.Array;
 import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class DatepickerTest extends BaseTest {
 
@@ -27,8 +30,7 @@ public class DatepickerTest extends BaseTest {
 
         //-----GET FULL VALUE FROM THE FIELD
         wait.until(ExpectedConditions.attributeToBe(By.className("form-control"), "class", "form-control"));
-        String currentDateFromDropdown = Browser.getBrowser().findElementByClassName("form-control").getAttribute("value");
-        Assert.assertEquals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")), currentDateFromDropdown);
+        Assert.assertEquals(today.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")), getDateFieldValue());
 
         //-----READ VALUE FROM BUTTONS
         DateTimeFormatter day = DateTimeFormatter.ofPattern("d");
@@ -55,7 +57,7 @@ public class DatepickerTest extends BaseTest {
     }
 
     @Test
-    public void selectDate(){
+    public void selectNextMonthDate(){
 
         scrollAndGoTo(wdu.getHomepage().getDatepickerLink());
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//h1[text()='Datepicker']")));
@@ -63,7 +65,26 @@ public class DatepickerTest extends BaseTest {
 
         wdu.getDatepicker().getForwardButton().click(); //go one month forward
 
+        Month selectedMonth = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).getMonth();
+        boolean isItLeapYear = YearMonth.parse(wdu.getDatepicker().getMonthUpButton().getText(), DateTimeFormatter.ofPattern("MMMM yyyy")).isLeapYear();
+        int monthLenght = selectedMonth.length(isItLeapYear);
 
+        Random r = new Random(); //click a random date
+        int min = 1;
+        int max = monthLenght-1;
+        int dateRange = r.nextInt(max-min) + min;
+        String selectedDate = wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").getText();
+        wdu.getDatepicker().findElement("(//tbody/tr/td)["+dateRange+"]").click();
+
+        wdu.getDatepicker().getCalendarButton().click(); //expand the calendar again to read the month value
+        String selectedMonthYear = wdu.getDatepicker().getMonthUpButton().getText();
+
+        String selectedDateComplete = selectedDate +" "+selectedMonthYear;
+        LocalDate selectedDateFormatted = LocalDate.parse(selectedDateComplete, DateTimeFormatter.ofPattern("d MMMM yyyy"));
+
+        wait.until(ExpectedConditions.attributeToBe(By.className("form-control"), "class", "form-control"));
+        Assert.assertEquals(selectedDateFormatted.format(DateTimeFormatter.ofPattern("MM-dd-yyyy")), getDateFieldValue());
+        System.out.println("Selected date is "+ selectedDateComplete);
 
 
     }
